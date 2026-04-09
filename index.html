@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jadwal Waktu Sholat</title>
+  <meta name="description" content="Jadwal waktu sholat harian berdasarkan kota di Indonesia." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Scheherazade+New:wght@400;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Canvas for particle stars -->
+  <canvas id="stars-canvas"></canvas>
+
+  <!-- Geometric SVG overlay -->
+  <div class="geo-overlay" aria-hidden="true">
+    <svg id="geo-svg" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <!-- Moon arc top decoration -->
+  <div class="moon-arc" aria-hidden="true"></div>
+
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" id="theme-toggle" aria-label="Ganti tema">
+    <span class="toggle-track">
+      <span class="toggle-icon toggle-icon--dark" aria-hidden="true">
+        <!-- Moon -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </span>
+      <span class="toggle-icon toggle-icon--light" aria-hidden="true">
+        <!-- Sun -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <circle cx="12" cy="12" r="4"/>
+          <line x1="12" y1="2" x2="12" y2="5"/>
+          <line x1="12" y1="19" x2="12" y2="22"/>
+          <line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/>
+          <line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/>
+          <line x1="2" y1="12" x2="5" y2="12"/>
+          <line x1="19" y1="12" x2="22" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/>
+          <line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/>
+        </svg>
+      </span>
+      <span class="toggle-thumb"></span>
+    </span>
+    <span class="toggle-label" id="toggle-label">Light</span>
+  </button>
+
+  <main class="page">
+
+    <!-- ── HEADER ── -->
+    <header class="site-header" data-anim="fade-up" data-delay="0">
+      <div class="bismillah" lang="ar" aria-label="Bismillahirrahmanirrahim">
+        بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
+      </div>
+      <div class="header-rule">
+        <span class="rule-line"></span>
+        <span class="rule-diamond"></span>
+        <span class="rule-line"></span>
+      </div>
+      <h1 class="site-title">
+        <span class="title-ar" lang="ar">مَوَاقِيت</span>
+        <span class="title-id">Waktu Sholat</span>
+      </h1>
+      <p class="site-tagline">Jadwal Harian · Indonesia</p>
+    </header>
+
+    <!-- ── DATE BAR ── -->
+    <div class="date-bar" data-anim="fade-up" data-delay="100">
+      <span class="date-gregorian" id="date-gregorian">-</span>
+      <span class="date-sep">·</span>
+      <span class="date-hijri" id="date-hijri" lang="ar">-</span>
+    </div>
+
+    <!-- ── SEARCH ── -->
+    <div class="search-block" data-anim="fade-up" data-delay="200">
+      <div class="search-inner">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/>
+        </svg>
+        <input
+          type="text"
+          id="city-input"
+          placeholder="Ketik nama kota..."
+          value="Malang"
+          autocomplete="off"
+          spellcheck="false"
+          aria-label="Nama kota"
+        />
+        <button id="search-btn" aria-label="Cari jadwal sholat">
+          <span>Cari</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </button>
+      </div>
+      <div class="search-status" id="search-status" role="status" aria-live="polite"></div>
+    </div>
+
+    <!-- ── NEXT PRAYER CARD ── -->
+    <div class="next-card" id="next-card" data-anim="fade-up" data-delay="300" hidden>
+      <div class="next-card-bg" aria-hidden="true"></div>
+      <div class="next-card-content">
+        <div class="next-label">Sholat Berikutnya</div>
+        <div class="next-main">
+          <div class="next-left">
+            <div class="next-name-id" id="next-name-id">-</div>
+            <div class="next-name-ar" id="next-name-ar" lang="ar">-</div>
+          </div>
+          <div class="next-right">
+            <div class="next-time" id="next-time">-</div>
+            <div class="next-countdown" id="next-countdown">-</div>
+          </div>
+        </div>
+        <div class="next-progress-wrap">
+          <div class="next-progress-bar" id="next-progress-bar"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PRAYER LIST ── -->
+    <div class="prayer-list" id="prayer-list" data-anim="fade-up" data-delay="400">
+      <!-- injected by JS -->
+    </div>
+
+    <!-- ── LOCATION TAG ── -->
+    <div class="location-tag" id="location-tag" hidden>
+      <span class="loc-dot"></span>
+      <span id="location-text">-</span>
+    </div>
+
+    <!-- ── ORNAMENT ── -->
+    <div class="ornament" aria-hidden="true">
+      <svg viewBox="0 0 200 30" xmlns="http://www.w3.org/2000/svg">
+        <line x1="0" y1="15" x2="75" y2="15" stroke="currentColor" stroke-width="0.5" opacity="0.4"/>
+        <polygon points="100,5 108,15 100,25 92,15" fill="none" stroke="currentColor" stroke-width="0.8"/>
+        <circle cx="100" cy="15" r="2" fill="currentColor" opacity="0.6"/>
+        <line x1="125" y1="15" x2="200" y2="15" stroke="currentColor" stroke-width="0.5" opacity="0.4"/>
+        <circle cx="30" cy="15" r="1.5" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.4"/>
+        <circle cx="170" cy="15" r="1.5" fill="none" stroke="currentColor" stroke-width="0.6" opacity="0.4"/>
+      </svg>
+    </div>
+
+    <!-- ── FOOTER CREDIT ── -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-label">Dibuat dengan ♡ oleh</div>
+        <div class="footer-name">Agus Satria Adhitama</div>
+        <div class="footer-copy">© 2025 · Mawaqit · Jadwal Waktu Sholat Indonesia</div>
+      </div>
+    </footer>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
