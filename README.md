@@ -3,7 +3,7 @@
 Web app untuk menampilkan jadwal sholat seluruh kota di Indonesia  
 dengan data real-time, dark/light mode, dan desain Islami modern.
 
-🔗 Live Demo : https://agusadhitama.github.io/jadwal-sholat/
+🔗 [Live Demo](https://agusadhitama.github.io/jadwal-sholat/)
 
 ---
 
